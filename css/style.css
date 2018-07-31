@@ -1,0 +1,30 @@
+*{
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+.container{
+    width: 1140px;
+    margin: 0 auto;
+}
+
+.filters{
+    width: 100%;
+}
+
+.filters:after{
+    content: '';
+    clear: both;
+    display: block;
+}
+
+.filter{
+    float: left;
+    width: 50%;
+    padding: 10px 20px;
+}
+
+.filter p{
+    margin-bottom: 10px;
+}
