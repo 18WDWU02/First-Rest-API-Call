@@ -28,3 +28,15 @@
 .filter p{
     margin-bottom: 10px;
 }
+
+#infoBox{
+    display: block;
+}
+
+.info_image{
+    float: left;
+}
+
+.info_bio{
+    float: left;
+}

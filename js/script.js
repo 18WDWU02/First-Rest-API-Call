@@ -1,10 +1,10 @@
 google.charts.load('current', {'packages':['corechart']});
-// google.charts.setOnLoadCallback(drawChart);
 
 var minAge = 0;
 var maxAge = 100;
 var minIncome = 42000;
 var maxIncome = 100000;
+var dataJSON;
 
 $( function() {
     $( "#slider-range" ).slider({
@@ -35,7 +35,7 @@ $( function() {
      },
        stop: function(event, ui){
            minIncome = $( "#slider-range2" ).slider( "values", 0 );
-           minIncome = $( "#slider-range2" ).slider( "values", 1 );
+           maxIncome = $( "#slider-range2" ).slider( "values", 1 );
            getData(minAge, maxAge, minIncome, maxIncome);
        }
      });
@@ -60,11 +60,13 @@ $.ajax({
 });
 
 function getData(minAge, maxAge, minIncome, maxIncome){
+    console.log("https://my.api.mockaroo.com/peopledata.json?min_age="+minAge+"&max_age="+maxAge+"&min_money="+minIncome+"&max_money="+maxIncome+"&key="+key);
     $.ajax({
         url: "https://my.api.mockaroo.com/peopledata.json?min_age="+minAge+"&max_age="+maxAge+"&min_money="+minIncome+"&max_money="+maxIncome+"&key="+key,
         dataType: "json",
         type: "GET",
         success:function(mockarooData){
+            dataJSON = mockarooData;
             const dataTable = new google.visualization.DataTable();
             dataTable.addColumn("number", "Age");
             dataTable.addColumn("number", "Annual Income");
@@ -74,13 +76,31 @@ function getData(minAge, maxAge, minIncome, maxIncome){
             }
             var options = {
               title: 'Age vs. Income comparison',
-              hAxis: {title: 'Age', minValue: 0, maxValue: 100},
-              vAxis: {title: 'Annual Income', minValue: 40000, maxValue: 100000},
+              hAxis: {title: 'Age', minValue: minAge, maxValue: maxAge},
+              vAxis: {title: 'Annual Income', minValue: minIncome, maxValue: maxIncome},
               legend: 'none'
             };
             var chart = new google.visualization.ScatterChart(document.getElementById('chart_div'));
-
+            google.visualization.events.addListener(chart, 'select', clickEvent);
             chart.draw(dataTable, options);
+
+            function clickEvent(){
+                var tableRow = chart.getSelection()[0].row;
+                chart.setSelection();
+                var personData = dataJSON[tableRow];
+                if(personData){
+                    document.getElementById('name').innerText = personData.first_name + " " + personData.last_name;
+                    document.getElementById('avatarImage').src = personData.profile_image;
+                    document.getElementById('avatarImage').alt = "Image of " + personData.first_name;
+                    document.getElementById('age').innerText = personData.age;
+                    document.getElementById('gender').innerText = personData.gender;
+                    document.getElementById('email').innerText = personData.email;
+                    document.getElementById('company').innerText = personData.company;
+                    document.getElementById('jobTitle').innerText = personData.occupation;
+                    document.getElementById('income').innerText = personData.income;
+                }
+            }
+
 
         },
         error:function(error){
